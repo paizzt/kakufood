@@ -8,7 +8,7 @@ echo.
 
 :: Cek Git
 where git >nul 2>nul
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] Git tidak ditemukan! Harap install Git terlebih dahulu.
     echo     Buka: https://git-scm.com/
     goto :error
@@ -18,8 +18,8 @@ if %errorlevel% neq 0 (
 
 :: Cek PHP
 where php >nul 2>nul
-if %errorlevel% neq 0 (
-    echo [X] PHP tidak ditemukan! Harap install PHP ^(misalnya via XAMPP atau Laragon^).
+if !errorlevel! neq 0 (
+    echo [X] PHP tidak ditemukan! Harap install PHP misal via XAMPP atau Laragon.
     echo     Pastikan PHP sudah didaftarkan ke System PATH.
     goto :error
 ) else (
@@ -28,7 +28,7 @@ if %errorlevel% neq 0 (
 
 :: Cek Composer
 where composer >nul 2>nul
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] Composer tidak ditemukan! Harap install Composer terlebih dahulu.
     echo     Buka: https://getcomposer.org/
     goto :error
@@ -38,7 +38,7 @@ if %errorlevel% neq 0 (
 
 :: Cek Node.js
 where node >nul 2>nul
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] Node.js tidak ditemukan! Harap install Node.js terlebih dahulu.
     echo     Buka: https://nodejs.org/
     goto :error
@@ -48,7 +48,7 @@ if %errorlevel% neq 0 (
 
 :: Cek NPM
 where npm >nul 2>nul
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] NPM tidak ditemukan! Harap install Node.js yang sudah termasuk NPM.
     goto :error
 ) else (
@@ -61,15 +61,15 @@ echo ===================================================
 echo.
 
 echo [1/5] Mengambil pembaruan terbaru dari GitHub...
-git pull origin main
-if %errorlevel% neq 0 (
+call git pull origin main
+if !errorlevel! neq 0 (
     echo [!] PERINGATAN: Gagal menarik update dari Git. Melanjutkan dengan versi lokal yang ada...
 )
 echo.
 
 echo [2/5] Memeriksa dependensi dan konfigurasi Backend (PHP/Laravel)...
 if not exist "backend" (
-    echo [X] Folder 'backend' tidak ditemukan! Pastikan script dijalankan di folder utama (root) proyek.
+    echo [X] Folder 'backend' tidak ditemukan! Pastikan script dijalankan di folder utama proyek.
     goto :error
 )
 cd backend
@@ -88,7 +88,7 @@ if not exist ".env" (
 
 echo Menginstall paket Composer...
 call composer install
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] Gagal menjalankan composer install!
     cd ..
     goto :error
@@ -96,26 +96,26 @@ if %errorlevel% neq 0 (
 
 :: Cek apakah APP_KEY kosong di .env, jika ya, generate.
 findstr /C:"APP_KEY=" .env >nul
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     findstr /C:"APP_KEY=base64" .env >nul
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [INFO] Membuat APP_KEY...
         call php artisan key:generate
     )
 )
 
-echo Menjalankan migrasi database (opsional jika baru)...
+echo Menjalankan migrasi database...
 call php artisan migrate --force
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!] PERINGATAN: Gagal melakukan migrasi database.
-    echo     Pastikan aplikasi database MySQL/XAMPP sudah berjalan dan pengaturan di file backend/.env sudah benar.
+    echo     Pastikan aplikasi database MySQL atau XAMPP sudah berjalan.
 )
 cd ..
 echo.
 
 echo [3/5] Memeriksa dependensi dan konfigurasi Frontend (Node.js/Next.js)...
 if not exist "frontend" (
-    echo [X] Folder 'frontend' tidak ditemukan! Pastikan script dijalankan di folder utama (root) proyek.
+    echo [X] Folder 'frontend' tidak ditemukan! Pastikan script dijalankan di folder utama proyek.
     goto :error
 )
 cd frontend
@@ -132,7 +132,7 @@ if not exist ".env" (
 
 echo Menginstall paket NPM...
 call npm install
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [X] Gagal menjalankan npm install!
     cd ..
     goto :error
@@ -143,23 +143,23 @@ echo.
 echo [4/5] Memeriksa status Port...
 :: Cek port 8000 untuk Laravel
 netstat -aon | findstr ":8000 " >nul
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     echo [!] PERINGATAN: Port 8000 (Backend) sedang digunakan oleh program lain.
-    echo     Server backend mungkin gagal berjalan atau akan berpindah ke port lain (misal 8001).
+    echo     Server backend mungkin gagal berjalan atau akan berpindah ke port lain.
 )
 :: Cek port 3000 untuk Next.js
 netstat -aon | findstr ":3000 " >nul
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     echo [!] PERINGATAN: Port 3000 (Frontend) sedang digunakan oleh program lain.
-    echo     Server frontend mungkin gagal berjalan atau akan berpindah ke port lain (misal 3001).
+    echo     Server frontend mungkin gagal berjalan atau akan berpindah ke port lain.
 )
 echo.
 
 echo [5/5] Menjalankan Server...
-echo Menjalankan server Backend (Laravel) di jendela baru...
+echo Menjalankan server Backend di jendela baru...
 start "Backend Laravel" cmd /k "cd backend && php artisan serve"
 
-echo Menjalankan server Frontend (Next.js) di jendela baru...
+echo Menjalankan server Frontend di jendela baru...
 start "Frontend Next.js" cmd /k "cd frontend && npm run dev"
 
 echo.
@@ -172,7 +172,7 @@ echo - Frontend: http://localhost:3000
 echo.
 echo Silakan buka browser Anda dan akses: http://localhost:3000
 echo.
-echo (Biarkan jendela terminal yang baru terbuka. Jika ingin mematikan server, cukup tutup jendela terminal tersebut.)
+echo Jika ingin mematikan server, cukup tutup jendela terminal tersebut.
 echo ===================================================
 pause
 exit /b
@@ -182,7 +182,7 @@ echo.
 echo ===================================================
 echo TERJADI KESALAHAN!
 echo Proses dihentikan karena adanya kendala pada sistem atau file.
-echo Silakan perbaiki masalah yang disebutkan (tanda [X]) lalu jalankan kembali script ini.
+echo Silakan perbaiki masalah tanda X lalu jalankan kembali script ini.
 echo ===================================================
 pause
 exit /b
