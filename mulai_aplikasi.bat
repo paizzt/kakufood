@@ -1,7 +1,61 @@
 @echo off
 title Menjalankan Aplikasi Kaku Food
 echo ===================================================
-echo Mempersiapkan dan Menjalankan Aplikasi Kaku Food
+echo Memeriksa Persyaratan (Prerequisites) Sistem...
+echo ===================================================
+echo.
+
+:: Cek Git
+where git >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [X] Git tidak ditemukan! Harap install Git terlebih dahulu.
+    echo     Buka: https://git-scm.com/
+    goto :error
+) else (
+    echo [V] Git terdeteksi.
+)
+
+:: Cek PHP
+where php >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [X] PHP tidak ditemukan! Harap install PHP ^(misalnya via XAMPP atau Laragon^).
+    echo     Pastikan PHP sudah didaftarkan ke System PATH.
+    goto :error
+) else (
+    echo [V] PHP terdeteksi.
+)
+
+:: Cek Composer
+where composer >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [X] Composer tidak ditemukan! Harap install Composer terlebih dahulu.
+    echo     Buka: https://getcomposer.org/
+    goto :error
+) else (
+    echo [V] Composer terdeteksi.
+)
+
+:: Cek Node.js
+where node >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [X] Node.js tidak ditemukan! Harap install Node.js terlebih dahulu.
+    echo     Buka: https://nodejs.org/
+    goto :error
+) else (
+    echo [V] Node.js terdeteksi.
+)
+
+:: Cek NPM
+where npm >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [X] NPM tidak ditemukan! Harap install Node.js yang sudah termasuk NPM.
+    goto :error
+) else (
+    echo [V] NPM terdeteksi.
+)
+
+echo.
+echo Semua persyaratan terpenuhi! Melanjutkan ke proses instalasi dan peluncuran aplikasi...
 echo ===================================================
 echo.
 
@@ -41,3 +95,14 @@ echo.
 echo (Biarkan jendela terminal yang baru terbuka. Jika ingin mematikan server, cukup tutup jendela terminal tersebut.)
 echo ===================================================
 pause
+exit /b
+
+:error
+echo.
+echo ===================================================
+echo TERJADI KESALAHAN!
+echo Aplikasi gagal dijalankan karena ada persyaratan yang belum terpenuhi.
+echo Silakan install aplikasi yang bertanda [X] di atas lalu coba jalankan kembali file ini.
+echo ===================================================
+pause
+exit /b
