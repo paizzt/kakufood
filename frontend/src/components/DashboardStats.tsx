@@ -13,7 +13,7 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon: Icon, variant = 'primary', href }: StatCardProps) {
   const cardContent = (
-    <div className={`card h-100 border-0 shadow-sm ${href ? 'hover-primary cursor-pointer' : ''}`} style={{ transition: 'all 0.2s' }} onMouseEnter={(e) => href && (e.currentTarget.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => href && (e.currentTarget.style.transform = 'translateY(0)')}>
+    <div className={`card h-100 border-0 shadow-sm ${href ? 'hover-primary cursor-pointer' : ''}`}>
       <div className="card-body d-flex align-items-center">
         <div className={`flex-shrink-0 bg-primary bg-opacity-10 text-primary rounded p-3 me-3`}>
           <Icon size={24} />
