@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import Swal from 'sweetalert2';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 
 export default function CategoriesPage() {
