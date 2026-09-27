@@ -125,7 +125,7 @@ export default async function DashboardPage() {
             </div>
             <div className="card-body">
               {data.needs_attention && data.needs_attention.length > 0 ? (
-                <ul className="list-group list-group-flush">
+                <div className="list-group list-group-flush">
                   {data.needs_attention.map((item: any) => (
                     <Link 
                       href={`/dashboard/equipment/${item.id}`} 
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
                       </span>
                     </Link>
                   ))}
-                </ul>
+                </div>
               ) : (
                 <div className="text-muted small text-center py-4">
     <div className="mb-1 fw-medium text-success">Semua Normal</div>
