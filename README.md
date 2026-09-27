@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://ui-avatars.com/api/?name=Kaku+Food&background=0D8ABC&color=fff&size=150&rounded=true" alt="Kaku Food Logo">
+  <img src="frontend/public/logo.jpg" alt="Kaku Food Logo" width="150" style="border-radius: 12px; margin-bottom: 20px;">
   
   <h1>Kaku Food - Equipment Monitoring System</h1>
   
