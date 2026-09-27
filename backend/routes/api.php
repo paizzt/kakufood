@@ -10,6 +10,8 @@ Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Api\AuthController::class, 'me']);
+    Route::put('/user/profile', [\App\Http\Controllers\Api\AuthController::class, 'updateProfile']);
+    Route::put('/user/password', [\App\Http\Controllers\Api\AuthController::class, 'updatePassword']);
     
     Route::apiResource('equipment', \App\Http\Controllers\Api\EquipmentController::class);
     Route::apiResource('branches', \App\Http\Controllers\Api\BranchController::class);

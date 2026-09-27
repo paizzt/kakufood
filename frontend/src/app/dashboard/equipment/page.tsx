@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { Plus, Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -33,10 +34,12 @@ export default function EquipmentPage() {
   });
 
   // Filters
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [branchId, setBranchId] = useState('');
-  const [conditionFilter, setConditionFilter] = useState('');
+  const [conditionFilter, setConditionFilter] = useState(searchParams.get('condition') || '');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
 
   const fetchOptions = async () => {
     try {
@@ -64,6 +67,7 @@ export default function EquipmentPage() {
       if (categoryId) params.append('category_id', categoryId);
       if (branchId) params.append('branch_id', branchId);
       if (conditionFilter) params.append('condition', conditionFilter);
+      if (statusFilter) params.append('status', statusFilter);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/equipment?${params.toString()}`, { 
         headers: { 'Authorization': `Bearer ${token}` }
@@ -231,6 +235,16 @@ export default function EquipmentPage() {
                 <option value="Baik">Baik</option>
                 <option value="Rusak Ringan">Rusak Ringan</option>
                 <option value="Rusak Berat">Rusak Berat</option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <select className="form-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+                <option value="">Status</option>
+                <option value="Aktif">Aktif</option>
+                <option value="Dalam Perbaikan">Dalam Perbaikan</option>
+                <option value="Hilang">Hilang</option>
+                <option value="Tidak Digunakan">Tidak Digunakan</option>
+                <option value="Dipindahkan">Dipindahkan</option>
               </select>
             </div>
             <div className="col-md-2">

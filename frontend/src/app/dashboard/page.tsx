@@ -127,19 +127,19 @@ export default async function DashboardPage() {
               {data.needs_attention && data.needs_attention.length > 0 ? (
                 <ul className="list-group list-group-flush">
                   {data.needs_attention.map((item: any) => (
-                    <li className="list-group-item px-0 border-bottom-0 mb-2" key={item.id}>
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div>
-                          <Link href={`/dashboard/equipment/${item.id}`} className="d-block text-dark fw-bold text-decoration-none hover-primary">
-                            {item.code}
-                          </Link>
-                          <span className="text-muted small">{item.name} ({item.branch?.name || '-'})</span>
-                        </div>
-                        <span className={`badge bg-${getConditionColor(item.condition)} rounded-pill`}>
-                          {item.condition}
-                        </span>
+                    <Link 
+                      href={`/dashboard/equipment/${item.id}`} 
+                      className="list-group-item list-group-item-action px-2 py-2 border-0 rounded mb-2 d-flex justify-content-between align-items-start" 
+                      key={item.id}
+                    >
+                      <div>
+                        <div className="fw-bold text-dark">{item.code}</div>
+                        <span className="text-muted small">{item.name} ({item.branch?.name || '-'})</span>
                       </div>
-                    </li>
+                      <span className={`badge bg-${getConditionColor(item.condition)} rounded-pill mt-1`}>
+                        {item.condition}
+                      </span>
+                    </Link>
                   ))}
                 </ul>
               ) : (
