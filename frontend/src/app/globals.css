@@ -1,0 +1,141 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Maroon Theme Variables */
+:root {
+  --bs-primary: #800000;
+  --bs-primary-rgb: 128, 0, 0;
+  --bs-link-color: #800000;
+  --bs-link-hover-color: #5c0000;
+}
+
+body {
+  font-family: 'Inter', sans-serif !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Enterprise Cards */
+.card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.15s ease-in-out;
+}
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Enterprise Tables */
+.table-responsive {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: none;
+}
+.table { margin-bottom: 0 !important; }
+.table thead th {
+  background-color: #ffffff !important;
+  border-bottom: 2px solid #f1f5f9 !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem !important;
+}
+.table tbody td {
+  padding: 1rem 1.25rem !important;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+/* Colors & Buttons */
+.text-primary { color: var(--bs-primary) !important; }
+.text-primary:hover { color: #5c0000 !important; }
+.bg-primary { background-color: var(--bs-primary) !important; color: #ffffff !important; }
+.border-primary { border-color: var(--bs-primary) !important; }
+
+.btn {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease !important;
+}
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-primary {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #800000;
+  --bs-btn-border-color: #800000;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #660000;
+  --bs-btn-hover-border-color: #5c0000;
+  --bs-btn-focus-shadow-rgb: 128, 0, 0;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #5c0000;
+  --bs-btn-active-border-color: #530000;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #800000;
+  --bs-btn-border-color: #800000;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #800000;
+  --bs-btn-hover-border-color: #800000;
+  --bs-btn-focus-shadow-rgb: 128, 0, 0;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #800000;
+  --bs-btn-active-border-color: #800000;
+}
+
+/* Sidebar Utilities */
+.-translate-x-100 { transform: translateX(-100%); }
+.translate-x-0 { transform: translateX(0); }
+@media (min-width: 992px) {
+  .translate-lg-x-0 { transform: translateX(0) !important; }
+  .position-lg-static { position: static !important; }
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff !important;
+  background-color: var(--bs-primary) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0,0,0,0.2);
+}
+
+/* Typography & Badges */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em;
+}
+
+.badge {
+  font-weight: 500 !important;
+  padding: 0.35em 0.8em !important;
+}
+
+/* Accessibility Focus */
+*:focus-visible {
+  outline: 2px solid var(--bs-primary) !important;
+  outline-offset: 2px !important;
+}
