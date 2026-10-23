@@ -11,29 +11,43 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
+        $isStaff = ($user && $user->role === 'staff' && $user->branch_id);
+        $branchInfo = $isStaff ? Branch::find($user->branch_id) : null;
+
+        $equipmentQuery = Equipment::query();
+        if ($isStaff) {
+            $equipmentQuery->where('branch_id', $user->branch_id);
+        }
+
         // Total Equipment
-        $totalEquipment = Equipment::count();
-        $totalBranches = Branch::count();
+        $totalEquipment = (clone $equipmentQuery)->count();
+        $totalBranches = $isStaff ? 1 : Branch::count();
 
         // Condition stats
         $conditionStats = [
-            'baik' => Equipment::where('condition', 'Baik')->count(),
-            'rusak_ringan' => Equipment::where('condition', 'Rusak Ringan')->count(),
-            'rusak_berat' => Equipment::where('condition', 'Rusak Berat')->count(),
+            'baik' => (clone $equipmentQuery)->where('condition', 'Baik')->count(),
+            'rusak_ringan' => (clone $equipmentQuery)->where('condition', 'Rusak Ringan')->count(),
+            'rusak_berat' => (clone $equipmentQuery)->where('condition', 'Rusak Berat')->count(),
         ];
 
         // Status stats
         $statusStats = [
-            'aktif' => Equipment::where('status', 'Aktif')->count(),
-            'perbaikan' => Equipment::where('status', 'Dalam Perbaikan')->count(),
-            'hilang' => Equipment::where('status', 'Hilang')->count(),
+            'aktif' => (clone $equipmentQuery)->where('status', 'Aktif')->count(),
+            'perbaikan' => (clone $equipmentQuery)->where('status', 'Dalam Perbaikan')->count(),
+            'hilang' => (clone $equipmentQuery)->where('status', 'Hilang')->count(),
         ];
 
         // Recent audit logs
-        $recentActivities = \App\Models\AuditLog::with('user')->latest()->take(5)->get();
+        $logsQuery = \App\Models\AuditLog::with('user')->latest();
+        if ($isStaff) {
+            $logsQuery->where('user_id', $user->id);
+        }
+        $recentActivities = $logsQuery->take(5)->get();
 
         // Needs attention (Rusak Ringan, Rusak Berat)
-        $needsAttention = Equipment::with('branch')->whereIn('condition', ['Rusak Ringan', 'Rusak Berat'])->latest()->take(5)->get();
+        $attentionQuery = (clone $equipmentQuery)->with('branch')->whereIn('condition', ['Rusak Ringan', 'Rusak Berat'])->latest();
+        $needsAttention = $attentionQuery->take(5)->get();
 
         return response()->json([
             'data' => [
@@ -43,6 +57,8 @@ class DashboardController extends Controller
                 'statuses' => $statusStats,
                 'recent_activities' => $recentActivities,
                 'needs_attention' => $needsAttention,
+                'is_staff' => $isStaff,
+                'branch' => $branchInfo,
             ]
         ]);
     }

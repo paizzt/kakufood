@@ -8,6 +8,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 export default function BranchesPage() {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -26,6 +27,14 @@ export default function BranchesPage() {
   const fetchBranches = async () => {
     setLoading(true);
     try {
+      const userCookie = Cookies.get('user');
+      if (userCookie) {
+        try {
+          const parsed = JSON.parse(userCookie);
+          setIsAdmin(parsed.role === 'admin');
+        } catch (e) {}
+      }
+
       const token = Cookies.get('token');
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/branches`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -118,9 +127,11 @@ export default function BranchesPage() {
           <h2 className="fs-4 fw-bold mb-1">Daftar Cabang</h2>
           <p className="text-muted mb-0">Kelola master data cabang Kaku Food.</p>
         </div>
-        <button className="btn btn-primary d-flex align-items-center gap-2" onClick={handleOpenAdd}>
-          <Plus size={18} /> Tambah
-        </button>
+        {isAdmin && (
+          <button className="btn btn-primary d-flex align-items-center gap-2" onClick={handleOpenAdd}>
+            <Plus size={18} /> Tambah Cabang
+          </button>
+        )}
       </div>
 
       <div className="card border-0 shadow-sm">
@@ -134,14 +145,14 @@ export default function BranchesPage() {
                   <th>Kota</th>
                   <th>Penanggung Jawab</th>
                   <th>Status</th>
-                  <th className="text-end px-4">Aksi</th>
+                  {isAdmin && <th className="text-end px-4">Aksi</th>}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={6} className="text-center py-4">Memuat data...</td></tr>
+                  <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-4">Memuat data...</td></tr>
                 ) : branches.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-4">Tidak ada data.</td></tr>
+                  <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-4">Tidak ada data.</td></tr>
                 ) : (
                   branches.map((branch: any) => (
                     <tr key={branch.id}>
@@ -154,14 +165,16 @@ export default function BranchesPage() {
                           {branch.status.toUpperCase()}
                         </span>
                       </td>
-                      <td className="text-end px-4">
-                        <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleOpenEdit(branch)}>
-                          <Edit size={16} />
-                        </button>
-                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(branch.id)}>
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
+                      {isAdmin && (
+                        <td className="text-end px-4">
+                          <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleOpenEdit(branch)} title="Edit Cabang">
+                            <Edit size={16} />
+                          </button>
+                          <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(branch.id)} title="Hapus Cabang">
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}

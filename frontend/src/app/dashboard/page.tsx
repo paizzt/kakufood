@@ -71,7 +71,13 @@ export default async function DashboardPage() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fs-4 fw-bold mb-1">Monitoring Inventaris</h2>
-          <p className="text-muted mb-0">Overview status equipment dan aktivitas terbaru Kaku Food.</p>
+          <p className="text-muted mb-0">
+            {data.is_staff && data.branch ? (
+              <span>Overview status equipment khusus <strong>{data.branch.name} ({data.branch.city})</strong>.</span>
+            ) : (
+              <span>Overview status equipment dan aktivitas terbaru Kaku Food.</span>
+            )}
+          </p>
         </div>
         <div className="d-flex align-items-center gap-2 text-primary bg-primary bg-opacity-10 px-3 py-2 rounded">
           <ShieldCheck size={18} />

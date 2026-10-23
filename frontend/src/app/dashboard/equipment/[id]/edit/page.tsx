@@ -31,7 +31,16 @@ export default function EditEquipmentPage() {
     description: ''
   });
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   useEffect(() => {
+    const userCookie = Cookies.get('user');
+    if (userCookie) {
+      try {
+        setCurrentUser(JSON.parse(userCookie));
+      } catch (e) {}
+    }
+
     const token = Cookies.get('token');
     const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -149,12 +158,22 @@ export default function EditEquipmentPage() {
               </div>
               <div className="col-md-6">
                 <label className="form-label fw-medium">Cabang <span className="text-danger">*</span></label>
-                <select name="branch_id" className="form-select" value={formData.branch_id} onChange={handleChange} required>
+                <select
+                  name="branch_id"
+                  className={`form-select ${currentUser?.role === 'staff' ? 'bg-light' : ''}`}
+                  value={formData.branch_id}
+                  onChange={handleChange}
+                  disabled={currentUser?.role === 'staff'}
+                  required
+                >
                   <option value="">Pilih Cabang...</option>
                   {branches.map((branch: any) => (
                     <option key={branch.id} value={branch.id}>{branch.name} ({branch.city})</option>
                   ))}
                 </select>
+                {currentUser?.role === 'staff' && (
+                  <small className="text-muted">Staff tidak dapat memindahkan cabang equipment.</small>
+                )}
               </div>
 
               <div className="col-md-4">

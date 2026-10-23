@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use App\Models\Movement;
 use App\Models\Equipment;
@@ -7,9 +9,19 @@ use Illuminate\Http\Request;
 
 class MovementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $movements = Movement::with(['equipment', 'fromBranch', 'toBranch', 'user'])->latest()->get();
+        $user = $request->user();
+        $query = Movement::with(['equipment', 'fromBranch', 'toBranch', 'user'])->latest();
+
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $query->where(function ($q) use ($user) {
+                $q->where('from_branch_id', $user->branch_id)
+                  ->orWhere('to_branch_id', $user->branch_id);
+            });
+        }
+
+        $movements = $query->get();
         return response()->json(['data' => $movements]);
     }
 
@@ -22,9 +34,15 @@ class MovementController extends Controller
             'notes' => 'nullable|string',
         ]);
         
+        $user = $request->user();
         $equipment = Equipment::findOrFail($validated['equipment_id']);
+
+        if ($user && $user->role === 'staff' && $equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat memindahkan equipment di cabang Anda.'], 403);
+        }
+
         $validated['from_branch_id'] = $equipment->branch_id;
-        $validated['user_id'] = $request->user()->id;
+        $validated['user_id'] = $user->id;
         $validated['status'] = 'Selesai';
         
         $movement = Movement::create($validated);

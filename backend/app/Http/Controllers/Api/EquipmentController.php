@@ -14,7 +14,14 @@ class EquipmentController extends Controller
      */
     public function index(Request $request)
     {
+        $user = $request->user();
         $query = Equipment::with(['branch', 'category'])->latest();
+
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $query->where('branch_id', $user->branch_id);
+        } elseif ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -27,10 +34,6 @@ class EquipmentController extends Controller
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
-        }
-
-        if ($request->filled('branch_id')) {
-            $query->where('branch_id', $request->branch_id);
         }
 
         if ($request->filled('condition')) {
@@ -50,7 +53,14 @@ class EquipmentController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $user = $request->user();
+        $data = $request->all();
+
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $data['branch_id'] = $user->branch_id;
+        }
+
+        $validator = Validator::make($data, [
             'code' => 'required|string|unique:equipment',
             'name' => 'required|string',
             'category_id' => 'required|exists:categories,id',
@@ -63,11 +73,10 @@ class EquipmentController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $equipment = new Equipment($request->all());
+        $equipment = new Equipment($data);
         $equipment->save();
 
         // Generate SHA-256 Hash for Data Integrity
-        // Kombinasi: id + kode + tanggal_pengadaan
         $hashString = $equipment->id . '|' . $equipment->code . '|' . ($equipment->purchase_date ?? 'null');
         $equipment->hash_value = hash('sha256', $hashString);
         $equipment->save();
@@ -81,12 +90,17 @@ class EquipmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
+        $user = $request->user();
         $equipment = Equipment::with(['branch', 'category', 'damageReports.reporter', 'maintenances.user'])->find($id);
         
         if (!$equipment) {
             return response()->json(['message' => 'Equipment not found'], 404);
+        }
+
+        if ($user && $user->role === 'staff' && $equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat melihat equipment cabang Anda.'], 403);
         }
 
         // Fetch audit logs manually because relation is not explicitly defined in Model (module=equipment, record_id=$id)
@@ -112,13 +126,23 @@ class EquipmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $user = $request->user();
         $equipment = Equipment::find($id);
 
         if (!$equipment) {
             return response()->json(['message' => 'Equipment not found'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        if ($user && $user->role === 'staff' && $equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat memperbarui equipment cabang Anda.'], 403);
+        }
+
+        $data = $request->all();
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $data['branch_id'] = $user->branch_id;
+        }
+
+        $validator = Validator::make($data, [
             'code' => 'required|string|unique:equipment,code,'.$id,
             'name' => 'required|string',
             'category_id' => 'required|exists:categories,id',
@@ -131,7 +155,7 @@ class EquipmentController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $equipment->fill($request->all());
+        $equipment->fill($data);
         
         // Update hash value
         $hashString = $equipment->id . '|' . $equipment->code . '|' . ($equipment->purchase_date ?? 'null');
@@ -148,8 +172,13 @@ class EquipmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        $user = $request->user();
+        if ($user && $user->role === 'staff') {
+            return response()->json(['message' => 'Staff tidak diizinkan menghapus data equipment.'], 403);
+        }
+
         $equipment = Equipment::find($id);
 
         if (!$equipment) {

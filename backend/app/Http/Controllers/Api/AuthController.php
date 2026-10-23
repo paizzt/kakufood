@@ -32,6 +32,7 @@ class AuthController extends Controller
             ], 403);
         }
 
+        $user->load('branch');
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -43,7 +44,12 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-                'branch_id' => $user->branch_id
+                'branch_id' => $user->branch_id,
+                'branch' => $user->branch ? [
+                    'id' => $user->branch->id,
+                    'name' => $user->branch->name,
+                    'city' => $user->branch->city
+                ] : null
             ]
         ]);
     }

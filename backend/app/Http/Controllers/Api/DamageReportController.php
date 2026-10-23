@@ -9,9 +9,18 @@ use Illuminate\Http\Request;
 
 class DamageReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reports = DamageReport::with(['equipment.branch', 'reporter'])->latest()->get();
+        $user = $request->user();
+        $query = DamageReport::with(['equipment.branch', 'reporter'])->latest();
+
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $query->whereHas('equipment', function ($q) use ($user) {
+                $q->where('branch_id', $user->branch_id);
+            });
+        }
+
+        $reports = $query->get();
         return response()->json(['data' => $reports]);
     }
 
@@ -24,25 +33,37 @@ class DamageReportController extends Controller
             'description' => 'required|string',
         ]);
 
-        $validated['reporter_id'] = $request->user()->id;
+        $user = $request->user();
+        $equipment = Equipment::findOrFail($validated['equipment_id']);
+
+        if ($user && $user->role === 'staff' && $equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat melaporkan kerusakan equipment di cabang Anda.'], 403);
+        }
+
+        $validated['reporter_id'] = $user->id;
         $validated['status'] = 'Baru';
 
         $report = DamageReport::create($validated);
         
         // Auto update equipment condition
-        $equipment = Equipment::find($validated['equipment_id']);
-        if ($equipment && $validated['severity'] === 'Rusak Berat') {
+        if ($validated['severity'] === 'Rusak Berat') {
             $equipment->update(['condition' => 'Rusak Berat', 'status' => 'Tidak Digunakan']);
-        } elseif ($equipment && $validated['severity'] === 'Rusak Ringan') {
+        } elseif ($validated['severity'] === 'Rusak Ringan') {
             $equipment->update(['condition' => 'Rusak Ringan']);
         }
 
         return response()->json(['data' => $report], 201);
     }
 
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
+        $user = $request->user();
         $report = DamageReport::with(['equipment.branch', 'reporter'])->findOrFail($id);
+
+        if ($user && $user->role === 'staff' && $report->equipment && $report->equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat melihat laporan equipment cabang Anda.'], 403);
+        }
+
         return response()->json(['data' => $report]);
     }
 

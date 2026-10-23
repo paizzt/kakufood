@@ -9,14 +9,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Akses ditolak. Staff tidak memiliki wewenang untuk mengelola pengguna.'], 403);
+        }
+
         $users = User::with('branch')->latest()->get();
         return response()->json(['data' => $users]);
     }
 
     public function store(Request $request)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Akses ditolak. Staff tidak memiliki wewenang untuk mengelola pengguna.'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -33,14 +41,22 @@ class UserController extends Controller
         return response()->json(['data' => $user], 201);
     }
 
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Akses ditolak. Staff tidak memiliki wewenang untuk mengelola pengguna.'], 403);
+        }
+
         $user = User::with('branch')->findOrFail($id);
         return response()->json(['data' => $user]);
     }
 
     public function update(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Akses ditolak. Staff tidak memiliki wewenang untuk mengelola pengguna.'], 403);
+        }
+
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
@@ -60,11 +76,15 @@ class UserController extends Controller
         return response()->json(['data' => $user]);
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Akses ditolak. Staff tidak memiliki wewenang untuk mengelola pengguna.'], 403);
+        }
+
         $user = User::findOrFail($id);
         $user->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Pengguna berhasil dihapus'], 200);
     }
 }

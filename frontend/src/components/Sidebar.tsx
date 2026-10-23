@@ -12,7 +12,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [user, setUser] = React.useState<{name: string, role: string} | null>(null);
+  const [user, setUser] = React.useState<{name: string, role: string, branch?: { name: string }} | null>(null);
 
   React.useEffect(() => {
     const userCookie = Cookies.get('user');
@@ -51,15 +51,21 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     { name: 'Audit', href: '/dashboard/audit-logs', icon: AlertTriangle },
     { name: 'Kategori', href: '/dashboard/categories', icon: Box },
     { name: 'Cabang', href: '/dashboard/branches', icon: GitCompare },
-    { name: 'Pengguna', href: '/dashboard/users', icon: Settings },
+    // Menu Pengguna hanya untuk Admin / Kepala Cabang, staff tidak bisa kelola pengguna
+    ...(user?.role === 'admin' ? [{ name: 'Pengguna', href: '/dashboard/users', icon: Settings }] : []),
     { name: 'Pengaturan', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (
     <div className="d-flex flex-column flex-shrink-0 p-3 bg-white border-end shadow-sm h-100 overflow-y-auto custom-scrollbar" style={{ width: '250px' }}>
       <div className="d-flex justify-content-between align-items-center mb-3 mb-md-0 w-100 px-2">
-        <Link href="/dashboard" className="text-decoration-none d-flex align-items-center justify-content-center flex-grow-1">
+        <Link href="/dashboard" className="text-decoration-none d-flex flex-column align-items-center justify-content-center flex-grow-1">
           <img src="/logo.jpg" alt="Kaku Food Logo" style={{ height: '45px', width: 'auto', objectFit: 'contain' }} />
+          {user?.role === 'staff' && user?.branch?.name && (
+            <span className="badge bg-light text-primary border mt-2 text-wrap" style={{ fontSize: '11px' }}>
+              {user.branch.name}
+            </span>
+          )}
         </Link>
         {onClose && (
           <button className="btn btn-light d-lg-none p-1 border-0 rounded-circle" onClick={onClose}>

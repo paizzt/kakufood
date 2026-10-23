@@ -13,7 +13,7 @@ export default function DashboardLayout({
 }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isNotifOpen, setNotifOpen] = useState(false);
-  const [user, setUser] = React.useState<{name: string, role: string} | null>(null);
+  const [user, setUser] = React.useState<{name: string, role: string, branch?: { name: string }} | null>(null);
 
   React.useEffect(() => {
     const userCookie = Cookies.get('user');
@@ -99,7 +99,9 @@ export default function DashboardLayout({
             <div className="d-none d-md-flex align-items-center gap-2 border-start ps-3 ms-2">
               <div className="text-end">
                 <div className="fw-semibold small text-dark" style={{ lineHeight: '1.2' }}>{user?.name || 'Loading...'}</div>
-                <div className="text-muted" style={{ fontSize: '11px' }}>{user?.role || 'Admin'}</div>
+                <div className="text-muted" style={{ fontSize: '11px' }}>
+                  {user?.role === 'admin' ? 'Admin / Kepala Cabang' : user?.branch?.name ? `Staff (${user.branch.name})` : 'Staff Cabang'}
+                </div>
               </div>
               <img src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`} alt="" width="36" height="36" className="rounded-circle border" />
             </div>

@@ -14,6 +14,7 @@ export default function DetailEquipmentPage() {
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [integrityValid, setIntegrityValid] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [activeTab, setActiveTab] = useState('informasi');
 
   useEffect(() => {
@@ -29,6 +30,12 @@ export default function DetailEquipmentPage() {
         
         if (res.status === 401) {
           window.location.href = '/logout';
+          return;
+        }
+
+        if (res.status === 403) {
+          const errData = await res.json();
+          setErrorMessage(errData.message || 'Akses ditolak. Anda hanya dapat melihat equipment cabang Anda.');
           return;
         }
         
@@ -54,7 +61,7 @@ export default function DetailEquipmentPage() {
   if (!data) {
     return (
       <div className="text-center py-5">
-        <h3 className="text-danger">Equipment Tidak Ditemukan</h3>
+        <h3 className="text-danger">{errorMessage || 'Equipment Tidak Ditemukan'}</h3>
         <Link href="/dashboard/equipment" className="btn btn-outline-primary mt-3">Kembali ke Daftar</Link>
       </div>
     );

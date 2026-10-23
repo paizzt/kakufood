@@ -4,13 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 
 class MaintenanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $maintenances = Maintenance::with(['equipment.branch', 'user'])->latest()->get();
+        $user = $request->user();
+        $query = Maintenance::with(['equipment.branch', 'user'])->latest();
+
+        if ($user && $user->role === 'staff' && $user->branch_id) {
+            $query->whereHas('equipment', function ($q) use ($user) {
+                $q->where('branch_id', $user->branch_id);
+            });
+        }
+
+        $maintenances = $query->get();
         return response()->json(['data' => $maintenances]);
     }
 
@@ -28,7 +38,14 @@ class MaintenanceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $validated['user_id'] = $request->user()->id;
+        $user = $request->user();
+        $equipment = Equipment::findOrFail($validated['equipment_id']);
+
+        if ($user && $user->role === 'staff' && $equipment->branch_id != $user->branch_id) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat mencatat perawatan equipment di cabang Anda.'], 403);
+        }
+
+        $validated['user_id'] = $user->id;
 
         $maintenance = Maintenance::create($validated);
 

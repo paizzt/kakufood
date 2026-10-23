@@ -27,7 +27,22 @@ export default function AddEquipmentPage() {
     description: ''
   });
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   useEffect(() => {
+    const userCookie = Cookies.get('user');
+    let staffBranchId = '';
+    if (userCookie) {
+      try {
+        const u = JSON.parse(userCookie);
+        setCurrentUser(u);
+        if (u.role === 'staff' && u.branch_id) {
+          staffBranchId = String(u.branch_id);
+          setFormData(prev => ({ ...prev, branch_id: staffBranchId }));
+        }
+      } catch (e) {}
+    }
+
     const token = Cookies.get('token');
     const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -37,7 +52,11 @@ export default function AddEquipmentPage() {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/branches`, { headers }).then(res => res.json())
     ]).then(([catData, branchData]) => {
       setCategories(catData.data || []);
-      setBranches(branchData.data || []);
+      const bList = branchData.data || [];
+      setBranches(bList);
+      if (staffBranchId || bList.length === 1) {
+        setFormData(prev => ({ ...prev, branch_id: staffBranchId || String(bList[0].id) }));
+      }
     }).catch(err => console.error("Error fetching options:", err));
   }, []);
 
@@ -121,12 +140,22 @@ export default function AddEquipmentPage() {
               </div>
               <div className="col-md-6">
                 <label className="form-label fw-medium">Cabang <span className="text-danger">*</span></label>
-                <select name="branch_id" className="form-select" value={formData.branch_id} onChange={handleChange} required>
+                <select
+                  name="branch_id"
+                  className={`form-select ${currentUser?.role === 'staff' ? 'bg-light' : ''}`}
+                  value={formData.branch_id}
+                  onChange={handleChange}
+                  disabled={currentUser?.role === 'staff'}
+                  required
+                >
                   <option value="">Pilih Cabang...</option>
                   {branches.map((branch: any) => (
                     <option key={branch.id} value={branch.id}>{branch.name} ({branch.city})</option>
                   ))}
                 </select>
+                {currentUser?.role === 'staff' && (
+                  <small className="text-muted">Terkunci ke cabang penugasan Anda.</small>
+                )}
               </div>
 
               <div className="col-md-4">

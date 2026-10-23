@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import Swal from 'sweetalert2';
-import { Plus, Edit, Trash2, UserCog } from 'lucide-react';
+import { Plus, Edit, Trash2, UserCog, ShieldAlert } from 'lucide-react';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isStaff, setIsStaff] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -26,6 +27,16 @@ export default function UsersPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      const userCookie = Cookies.get('user');
+      if (userCookie) {
+        const parsed = JSON.parse(userCookie);
+        if (parsed.role !== 'admin') {
+          setIsStaff(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       const token = Cookies.get('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -122,6 +133,18 @@ export default function UsersPage() {
       setFormLoading(false);
     }
   };
+
+  if (isStaff) {
+    return (
+      <div className="card border-0 shadow-sm p-5 text-center my-4">
+        <div className="mx-auto mb-3 bg-danger bg-opacity-10 text-danger p-3 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '64px', height: '64px' }}>
+          <ShieldAlert size={32} />
+        </div>
+        <h4 className="fw-bold mb-2">Akses Dibatasi</h4>
+        <p className="text-muted mb-0">Staff tidak memiliki hak akses untuk mengelola pengguna. Halaman ini hanya dapat diakses oleh Administrator atau Kepala Cabang.</p>
+      </div>
+    );
+  }
 
   return (
     <div>

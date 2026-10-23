@@ -56,21 +56,6 @@ export default function CategoriesPage() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => {
-    const result = await Swal.fire({ title: 'Hapus Kategori?', text: 'Apakah Anda yakin ingin menghapus kategori ini?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#800000', confirmButtonText: 'Hapus' });
-    if (!result.isConfirmed) return;
-    try {
-      const token = Cookies.get('token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      fetchCategories();
-    } catch (err) {
-      Swal.fire('Error', 'Gagal menghapus data.', 'error');
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -150,11 +135,8 @@ export default function CategoriesPage() {
                         </span>
                       </td>
                       <td className="text-end px-4">
-                        <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleOpenEdit(cat)}>
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => handleOpenEdit(cat)} title="Edit Kategori">
                           <Edit size={16} />
-                        </button>
-                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(cat.id)}>
-                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>

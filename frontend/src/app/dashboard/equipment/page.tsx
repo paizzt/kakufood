@@ -82,7 +82,19 @@ export default function EquipmentPage() {
     }
   };
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   useEffect(() => {
+    const userCookie = Cookies.get('user');
+    if (userCookie) {
+      try {
+        const u = JSON.parse(userCookie);
+        setCurrentUser(u);
+        if (u.role === 'staff' && u.branch_id) {
+          setBranchId(String(u.branch_id));
+        }
+      } catch (e) {}
+    }
     fetchOptions();
     fetchEquipments();
   }, []);
@@ -96,7 +108,9 @@ export default function EquipmentPage() {
     setIsEdit(false);
     setFormData({
       code: '', name: '', description: '', serial_number: '',
-      category_id: '', branch_id: '', location: '', purchase_date: '',
+      category_id: '',
+      branch_id: currentUser?.role === 'staff' && currentUser?.branch_id ? String(currentUser.branch_id) : '',
+      location: '', purchase_date: '',
       purchase_price: '', condition: 'Baik', status: 'Aktif'
     });
     setShowModal(true);
@@ -224,10 +238,20 @@ export default function EquipmentPage() {
               </select>
             </div>
             <div className="col-md-2">
-              <select className="form-select" value={branchId} onChange={e => setBranchId(e.target.value)}>
-                <option value="">Cabang</option>
-                {branches.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
+              {currentUser?.role === 'staff' ? (
+                <input
+                  type="text"
+                  className="form-control bg-light"
+                  value={currentUser.branch?.name ? `Cabang: ${currentUser.branch.name}` : 'Cabang Anda'}
+                  disabled
+                  title="Anda hanya dapat melihat data cabang Anda"
+                />
+              ) : (
+                <select className="form-select" value={branchId} onChange={e => setBranchId(e.target.value)}>
+                  <option value="">Semua Cabang</option>
+                  {branches.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              )}
             </div>
             <div className="col-md-2">
               <select className="form-select" value={conditionFilter} onChange={e => setConditionFilter(e.target.value)}>
@@ -301,9 +325,11 @@ export default function EquipmentPage() {
                       <button onClick={() => handleOpenEdit(item)} className="btn btn-sm btn-light border text-primary" title="Edit">
                         <Edit size={16} />
                       </button>
-                      <button onClick={() => handleDelete(item.id)} className="btn btn-sm btn-light border text-primary" title="Hapus">
-                        <Trash2 size={16} />
-                      </button>
+                      {currentUser?.role === 'admin' && (
+                        <button onClick={() => handleDelete(item.id)} className="btn btn-sm btn-light border text-danger" title="Hapus">
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -342,7 +368,13 @@ export default function EquipmentPage() {
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-semibold text-muted mb-1">Cabang</label>
-                      <select className="form-select" value={formData.branch_id} onChange={e => setFormData({...formData, branch_id: e.target.value})} required>
+                      <select
+                        className={`form-select ${currentUser?.role === 'staff' ? 'bg-light' : ''}`}
+                        value={formData.branch_id}
+                        onChange={e => setFormData({...formData, branch_id: e.target.value})}
+                        disabled={currentUser?.role === 'staff'}
+                        required
+                      >
                         <option value="">Pilih Cabang</option>
                         {branches.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
                       </select>
