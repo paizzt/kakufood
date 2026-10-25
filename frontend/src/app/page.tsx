@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShieldCheck, Activity, ArrowRight, Zap, Database, BarChart3 } from 'lucide-react';
+import { Activity, Zap, Database, BarChart3 } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -35,51 +35,10 @@ export default function Home() {
               Platform enterprise terpusat untuk memantau, mengelola, dan memelihara seluruh inventaris operasional di seluruh cabang Kaku Food secara real-time.
             </p>
             
-            <div className="d-flex justify-content-center gap-3 mb-5 pb-3">
+            <div className="d-flex justify-content-center gap-3">
               <Link href="/login" className="btn btn-primary btn-lg px-5 py-3 fw-medium shadow-sm">
                 Buka Dashboard
               </Link>
-            </div>
-            
-            {/* Practical Dashboard Mockup */}
-            <div className="mx-auto rounded border shadow-sm overflow-hidden text-start" style={{ maxWidth: '850px', backgroundColor: '#f8fafc', height: '350px' }}>
-               <div className="bg-white border-bottom px-3 py-2 d-flex align-items-center justify-content-between">
-                 <div className="fw-medium small text-muted">Kaku Food Inventory System</div>
-                 <div className="d-flex gap-2">
-                    <div className="bg-light border rounded px-2 py-1" style={{ width: '150px' }}></div>
-                 </div>
-               </div>
-               <div className="d-flex h-100">
-                  {/* Sidebar */}
-                  <div className="border-end bg-white p-3 d-none d-md-block" style={{ width: '200px' }}>
-                    <div className="bg-light rounded mb-3" style={{height: '24px', width: '80%'}}></div>
-                    <div className="bg-light rounded mb-2" style={{height: '16px', width: '90%'}}></div>
-                    <div className="bg-light rounded mb-2" style={{height: '16px', width: '100%'}}></div>
-                    <div className="bg-light rounded mb-2" style={{height: '16px', width: '70%'}}></div>
-                  </div>
-                  {/* Content */}
-                  <div className="p-4 flex-grow-1">
-                    <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                      <div className="bg-light border rounded" style={{height: '32px', width: '200px'}}></div>
-                      <div className="bg-light border rounded" style={{height: '32px', width: '100px'}}></div>
-                    </div>
-                    {/* Table Mockup */}
-                    <div className="border rounded bg-white overflow-hidden">
-                      <div className="bg-light border-bottom p-2 d-flex gap-3">
-                        <div className="bg-secondary bg-opacity-10 rounded" style={{height: '12px', width: '20%'}}></div>
-                        <div className="bg-secondary bg-opacity-10 rounded" style={{height: '12px', width: '40%'}}></div>
-                        <div className="bg-secondary bg-opacity-10 rounded" style={{height: '12px', width: '20%'}}></div>
-                      </div>
-                      {[1,2,3].map(i => (
-                        <div key={i} className="border-bottom p-3 d-flex gap-3 align-items-center">
-                          <div className="bg-light rounded" style={{height: '16px', width: '20%'}}></div>
-                          <div className="bg-light rounded" style={{height: '16px', width: '40%'}}></div>
-                          <div className="bg-success bg-opacity-10 rounded" style={{height: '20px', width: '15%'}}></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-               </div>
             </div>
 
           </div>
