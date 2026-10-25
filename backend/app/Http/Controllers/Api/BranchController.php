@@ -11,10 +11,10 @@ class BranchController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        if ($user && $user->role === 'staff' && $user->branch_id) {
+        if ($user && $user->role === 'staff' && $user->branch_id && !$request->has('for_transfer') && !$request->has('all')) {
             $branches = Branch::where('id', $user->branch_id)->get();
         } else {
-            $branches = Branch::all();
+            $branches = Branch::where('status', 'active')->get();
         }
         return response()->json(['data' => $branches]);
     }

@@ -23,4 +23,8 @@ class Equipment extends Model
     public function maintenances() {
         return $this->hasMany(Maintenance::class);
     }
+
+    public function movements() {
+        return $this->hasMany(Movement::class)->latest();
+    }
 }

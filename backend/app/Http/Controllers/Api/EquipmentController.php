@@ -93,7 +93,15 @@ class EquipmentController extends Controller
     public function show(Request $request, string $id)
     {
         $user = $request->user();
-        $equipment = Equipment::with(['branch', 'category', 'damageReports.reporter', 'maintenances.user'])->find($id);
+        $equipment = Equipment::with([
+            'branch',
+            'category',
+            'damageReports.reporter',
+            'maintenances.user',
+            'movements.fromBranch',
+            'movements.toBranch',
+            'movements.user'
+        ])->find($id);
         
         if (!$equipment) {
             return response()->json(['message' => 'Equipment not found'], 404);
